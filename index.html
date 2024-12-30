@@ -1,0 +1,52 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forum Incu Ambu</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Forum Incu Ambu</h1>
+      <p>Tempat Diskusi Incu Ambu</p>
+    </header>
+
+    <!-- Halaman Daftar -->
+    <div id="register">
+      <h2>Daftar heula</h2>
+      <input type="text" id="register-username" placeholder="Masukkan nama pengguna" />
+      <input type="password" id="register-password" placeholder="Masukkan kata sandi" />
+      <button onclick="register()">Daftar</button>
+    </div>
+
+    <!-- Halaman Chat -->
+    <div id="chat" style="display: none;">
+      <h2>Forum Chat</h2>
+      <div id="messages"></div>
+      <input type="text" id="message-input" placeholder="Ketik pesan" />
+      <button onclick="sendMessage()">Kirim</button>
+      <button onclick="logout()">Logout</button>
+      <button onclick="showProfile()">Profile</button>
+    </div>
+
+    <!-- Halaman Profil -->
+    <div id="profile" style="display: none;">
+      <h2>Profil</h2>
+      <input type="text" id="profile-name" placeholder="Ganti nama" />
+      <input type="file" id="profile-photo" accept="image/*" />
+      <button onclick="updateProfile()">Simpan</button>
+      <button onclick="showChat()">Kembali</button>
+    </div>
+
+    <footer>
+      Dibuat oleh: Badu
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+    

@@ -1,52 +1,155 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Forum Incu Ambu</title>
-  <link rel="stylesheet" href="https://github.com/murphy2723/test/styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pencarian Ayat Al-Qur'an</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        select, button {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        #arabic {
+            font-size: 24px;
+            text-align: right;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        #translation {
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-  <div id="app">
-    <header>
-      <h1>Forum Incu Ambu</h1>
-      <p>Tempat Diskusi Incu Ambu</p>
-    </header>
+    <div class="container">
+        <h1>Pencarian Ayat Al-Qur'an</h1>
+        <form id="searchForm">
+            <label for="surah">Pilih Surah:</label>
+            <select id="surah" required>
+                <option value="">Pilih Surah</option>
+            </select>
 
-    <!-- Halaman Daftar -->
-    <div id="register">
-      <h2>Daftar heula</h2>
-      <input type="text" id="register-username" placeholder="Masukkan nama pengguna" />
-      <input type="password" id="register-password" placeholder="Masukkan kata sandi" />
-      <button onclick="register()">Daftar</button>
+            <label for="ayah">Pilih Ayat:</label>
+            <select id="ayah" required>
+                <option value="">Pilih Ayat</option>
+            </select>
+
+            <button type="submit">Cek</button>
+        </form>
+
+        <div id="result" class="result">
+            <h2>Hasil</h2>
+            <div id="arabic"></div>
+            <div id="translation"></div>
+        </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const surahSelect = document.getElementById('surah');
+            const ayahSelect = document.getElementById('ayah');
+            const resultArabic = document.getElementById('arabic');
+            const resultTranslation = document.getElementById('translation');
 
-    <!-- Halaman Chat -->
-    <div id="chat" style="display: none;">
-      <h2>Forum Chat</h2>
-      <div id="messages"></div>
-      <input type="text" id="message-input" placeholder="Ketik pesan" />
-      <button onclick="sendMessage()">Kirim</button>
-      <button onclick="logout()">Logout</button>
-      <button onclick="showProfile()">Profile</button>
-    </div>
+            // Fetch Surah List
+            fetch('https://api.quran.sutanlab.id/surah')
+                .then(response => response.json())
+                .then(data => {
+                    data.data.forEach(surah => {
+                        const option = document.createElement('option');
+                        option.value = surah.number;
+                        option.textContent = `${surah.number}. ${surah.englishName}`;
+                        surahSelect.appendChild(option);
+                    });
+                });
 
-    <!-- Halaman Profil -->
-    <div id="profile" style="display: none;">
-      <h2>Profil</h2>
-      <input type="text" id="profile-name" placeholder="Ganti nama" />
-      <input type="file" id="profile-photo" accept="image/*" />
-      <button onclick="updateProfile()">Simpan</button>
-      <button onclick="showChat()">Kembali</button>
-    </div>
+            // Update Ayah List on Surah Change
+            surahSelect.addEventListener('change', () => {
+                const surahNumber = surahSelect.value;
+                ayahSelect.innerHTML = '<option value="">Pilih Ayat</option>';
 
-    <footer>
-      Dibuat oleh: Badu
-    </footer>
-  </div>
+                if (surahNumber) {
+                    fetch(`https://api.quran.sutanlab.id/surah/${surahNumber}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            for (let i = 1; i <= data.data.numberOfAyahs; i++) {
+                                const option = document.createElement('option');
+                                option.value = i;
+                                option.textContent = `Ayat ${i}`;
+                                ayahSelect.appendChild(option);
+                            }
+                        });
+                }
+            });
 
-  <script src="https://github.com/murphy2723/test/script.js"></script>
+            // Fetch Ayah Data on Form Submit
+            document.getElementById('searchForm').addEventListener('submit', event => {
+                event.preventDefault();
+                const surahNumber = surahSelect.value;
+                const ayahNumber = ayahSelect.value;
+
+                if (surahNumber && ayahNumber) {
+                    fetch(`https://api.quran.sutanlab.id/surah/${surahNumber}/${ayahNumber}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            resultArabic.textContent = data.data.text.arab;
+                            resultTranslation.textContent = data.data.translation.id;
+                        });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-    
